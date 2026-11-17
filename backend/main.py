@@ -48,7 +48,7 @@ app.include_router(interview_router, prefix='/api/interview')
 
 @app.get('/api/health')
 def health():
-    return {'status': 'ok'}
+    return {'status': 'ok', 'integrations': {'gemini': 'configured' if interview_settings().gemini_api_key.get_secret_value() else 'not_configured'}}
 
 
 @app.exception_handler(Exception)

@@ -4,6 +4,7 @@ import { api, errorMessage } from './src/api'
 import DocumentPreparation from './src/DocumentPreparation'
 import QuestionStudio from './src/QuestionStudio'
 import InterviewRoom from './src/InterviewRoom'
+import { DRAFT_KEY } from './src/interviewSession'
 
 const journey = [
   { icon: FileText, title: 'Bring your story', detail: 'Review your resume and job requirements.', phase: 'Available now' },
@@ -17,7 +18,9 @@ export default function InterviewApp({ onComplete, embedded = false, requestedVi
   function setView(next) { if (embedded) onNavigate(next); else setLocalView(next) }
   const [documents, setDocuments] = useState({ resume: null, jd: null, analysis: null })
   const [launchPlan, setLaunchPlan] = useState(null)
-  const [roomStage, setRoomStage] = useState('setup')
+  const [roomStage, setRoomStage] = useState(() => {
+    try { return localStorage.getItem(DRAFT_KEY) ? 'practice' : 'setup' } catch { return 'setup' }
+  })
   const [roomSummary, setRoomSummary] = useState({ exists: false })
   const [options, setOptions] = useState(null)
   const [error, setError] = useState('')

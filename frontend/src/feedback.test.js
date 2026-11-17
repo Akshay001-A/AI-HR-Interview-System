@@ -10,6 +10,12 @@ test('UTF-8 upload bound protects multibyte files',()=>{
  assert.throws(()=>readInterview('x'.repeat(MAX_BYTES+1)),/2 MB/)
  assert.throws(()=>readInterview('界'.repeat(Math.ceil(MAX_BYTES/3)+1)),/2 MB/)
 })
+test('recovery drafts explain their progress and where to resume',()=>{
+ const draft={draft_version:1,status:'paused',questions:Array.from({length:6},()=>({})),answers:{q1:{text:'Answer one'},q2:{text:'Answer two'},q3:{text:'Answer three'},q4:{text:''},q5:{text:''},q6:{text:''}}}
+ assert.throws(()=>readInterview(JSON.stringify(draft)),/3 of 6 answered.*Restore it in Interview room/)
+ draft.status='completed'
+ assert.throws(()=>readInterview(JSON.stringify(draft)),/recovery backup.*Review feedback/)
+})
 function report(){return {report_version:'2.0',session_id:'s',generation:{source:'gemini'},overall_score:0,criteria_averages:Object.fromEntries(CRITERIA.map(k=>[k,0])),storage:{saved:true,engine:'sqlite',message:'Saved'},created_at:'2026-01-01T00:00:00Z',notice:'Practice feedback',role:'Developer',communication_analysis:{word_count:1,filler_word_count:0,filler_breakdown:{},notice:'Text only',timing_notice:'No speech timing'},recommendations:['Practise'],evaluations:[{question_id:'q1',question:'Question?',answer:'Answer',score:0,criteria:Object.fromEntries(CRITERIA.map(k=>[k,0])),strengths:['Clear action'],weaknesses:['Add outcome'],answer_template:'[your action]'}]}}
 test('real zero scores remain zero',()=>assert.equal(validateReport(report()).evaluations[0].score,0))
 test('invented or malformed report shapes rejected',()=>{

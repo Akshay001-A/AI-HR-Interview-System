@@ -5,6 +5,13 @@ export function readInterview(text) {
   if (new TextEncoder().encode(text).byteLength > MAX_BYTES) throw new Error('Choose an interview JSON file no larger than 2 MB.')
   let data
   try { data = JSON.parse(text) } catch { throw new Error('This file is not valid JSON.') }
+  if (data?.draft_version) {
+    if (data.status === 'completed') throw new Error('This is a recovery backup. Restore it in Interview room, then choose Review feedback or download the completed interview.')
+    const answered = data.answers && typeof data.answers === 'object'
+      ? Object.values(data.answers).filter(answer => typeof answer?.text === 'string' && answer.text.trim()).length : 0
+    const progress = Array.isArray(data.questions) ? ` (${answered} of ${data.questions.length} answered)` : ''
+    throw new Error(`This is an unfinished interview draft${progress}. Restore it in Interview room and complete the remaining answers before requesting feedback.`)
+  }
   if (!data || Array.isArray(data) || !Array.isArray(data.answers) || !data.answers.length) throw new Error('Choose a completed interview with at least one answer.')
   if (data.draft_version || data.plan_id || data.report_version) throw new Error('Choose a completed interview, rather than a draft, question plan or feedback report.')
   return data
