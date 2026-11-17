@@ -1,0 +1,256 @@
+{
+  "$defs": {
+    "Answer": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "minLength": 1,
+          "title": "Question Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "answer": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "input_mode": {
+          "enum": [
+            "text",
+            "voice"
+          ],
+          "title": "Input Mode",
+          "type": "string"
+        },
+        "duration_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Duration Seconds"
+        }
+      },
+      "required": [
+        "question_id",
+        "question",
+        "answer",
+        "input_mode"
+      ],
+      "title": "Answer",
+      "type": "object"
+    },
+    "Category": {
+      "enum": [
+        "HR",
+        "Behavioral",
+        "Situational"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "Difficulty": {
+      "enum": [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "JobDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 30000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "required_skills": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required Skills",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "JobDescription",
+      "type": "object"
+    },
+    "Question": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "minLength": 1,
+          "title": "Question Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "parent_question_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Question Id"
+        }
+      },
+      "required": [
+        "question_id",
+        "question"
+      ],
+      "title": "Question",
+      "type": "object"
+    },
+    "ResumeProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "skills": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Skills",
+          "type": "array"
+        },
+        "projects": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Projects",
+          "type": "array"
+        },
+        "education": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Education",
+          "type": "array"
+        },
+        "experience": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Experience",
+          "type": "array"
+        }
+      },
+      "title": "ResumeProfile",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "role": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Role",
+      "type": "string"
+    },
+    "category": {
+      "$ref": "#/$defs/Category",
+      "default": "HR"
+    },
+    "difficulty": {
+      "$ref": "#/$defs/Difficulty",
+      "default": "Beginner"
+    },
+    "question_count": {
+      "default": 5,
+      "maximum": 15,
+      "minimum": 1,
+      "title": "Question Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Session Id",
+      "type": "string"
+    },
+    "resume_profile": {
+      "$ref": "#/$defs/ResumeProfile"
+    },
+    "job_description": {
+      "$ref": "#/$defs/JobDescription"
+    },
+    "matched_skills": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Matched Skills",
+      "type": "array"
+    },
+    "skill_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Skill Gaps",
+      "type": "array"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/Question"
+      },
+      "minItems": 1,
+      "title": "Questions",
+      "type": "array"
+    },
+    "answers": {
+      "items": {
+        "$ref": "#/$defs/Answer"
+      },
+      "minItems": 1,
+      "title": "Answers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "role",
+    "session_id",
+    "resume_profile",
+    "job_description",
+    "questions",
+    "answers"
+  ],
+  "title": "InterviewSession",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

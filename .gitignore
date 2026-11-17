@@ -27,3 +27,9 @@ Thumbs.db
 # Temporary files
 *.log
 *.tmp
+
+# Local tooling and test outputs
+.cache/
+coverage/
+htmlcov/
+.coverage

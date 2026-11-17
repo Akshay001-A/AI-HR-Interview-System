@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "session_id": "sample_session_001",
+  "role": "Software Developer",
+  "category": "HR",
+  "difficulty": "Beginner",
+  "question_count": 1,
+  "resume_profile": {
+    "skills": ["Python", "SQL"],
+    "projects": ["Student placement tracker"],
+    "education": ["B.E. Information Science and Engineering"],
+    "experience": ["Collaborated with a three-person student project team"]
+  },
+  "job_description": {
+    "text": "Seeking a graduate software developer with Python, SQL and teamwork skills.",
+    "required_skills": ["Python", "SQL", "Teamwork"]
+  },
+  "matched_skills": ["Python", "SQL"],
+  "skill_gaps": ["Teamwork: needs a more specific example"],
+  "questions": [
+    {
+      "question_id": "q1",
+      "question": "How has your placement tracker project prepared you for this role?"
+    }
+  ],
+  "answers": [
+    {
+      "question_id": "q1",
+      "question": "How has your placement tracker project prepared you for this role?",
+      "answer": "I built the tracker with two classmates. I worked on Python endpoints and SQL queries, while coordinating our API format with the frontend developer. This gave me practical experience building a feature together and explaining technical decisions.",
+      "input_mode": "text"
+    }
+  ]
+}
