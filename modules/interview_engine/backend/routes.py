@@ -14,6 +14,13 @@ from .document_schemas import (
 )
 from .pdf_service import extract_pdf, read_upload
 from .profile_service import compare_profiles, extract_jd, extract_resume
+from .config import get_settings
+from .question_schemas import GenerationRequest, QuestionPlan
+from .question_service import generate_plan
+from .model_failover import configured_models
+from .session_schemas import CompleteInterviewRequest, DraftContextRequest, FollowupRequest, FollowupResult
+from .session_service import complete_interview, validate_followups, validate_plan
+from .followup_service import generate_followup
 
 router = APIRouter()
 CONTRACTS_DIR = Path(__file__).resolve().parents[3] / "contracts"
@@ -25,6 +32,13 @@ def interview_options():
         "categories": [c.value for c in Category],
         "difficulties": [d.value for d in Difficulty],
         "question_count": {"min": 1, "max": 15, "default": 5},
+        "generation": {
+            "gemini_configured": bool(get_settings().gemini_api_key.get_secret_value()),
+            "model": get_settings().gemini_model,
+            "hr_only": True,
+            "model_count": len(configured_models(get_settings())),
+            "request_budget_seconds": get_settings().gemini_request_budget_seconds,
+        },
     }
 
 
@@ -84,3 +98,33 @@ async def upload_job_description(
 def analyze_resume_and_jd(preparation: PreparationInput):
     """Compare the user's reviewed skill lists without AI calls or storage."""
     return compare_profiles(preparation)
+
+
+@router.post("/generate", response_model=QuestionPlan, response_model_exclude_none=True)
+def generate_hr_questions(request: GenerationRequest):
+    """Generate an unanswered HR question plan. No interview or database storage yet."""
+    return generate_plan(request)
+
+
+@router.post("/plan/validate", response_model=QuestionPlan, response_model_exclude_none=True)
+def validate_imported_plan(plan: QuestionPlan):
+    """Validate an imported question plan's shape and HR context, not its provenance."""
+    return validate_plan(plan)
+
+
+@router.post("/draft/validate", response_model=QuestionPlan, response_model_exclude_none=True)
+def validate_imported_draft(context: DraftContextRequest):
+    validate_plan(context.plan)
+    validate_followups(context.plan, context.followups)
+    return context.plan
+
+
+@router.post("/followup", response_model=FollowupResult)
+def adaptive_followup(request: FollowupRequest):
+    return generate_followup(request)
+
+
+@router.post("/complete", response_model=InterviewSession, response_model_exclude_none=True)
+def complete_session(request: CompleteInterviewRequest):
+    """Return a validated feedback-engine handoff without database persistence."""
+    return complete_interview(request)

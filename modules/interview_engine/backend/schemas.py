@@ -54,8 +54,8 @@ class Answer(ContractModel):
     question: NonBlank = Field(max_length=5000)
     answer: NonBlank = Field(max_length=20000)
     input_mode: Literal["text", "voice"]
-    # Missing timing is unknown, never a fabricated zero.
-    duration_seconds: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    # Engagement timing includes reading/typing; do not derive speaking-rate metrics.
+    duration_seconds: float | None = Field(default=None, ge=0, allow_inf_nan=False, description="Measured active time on this question, including reading and editing. Not speech-only duration; do not use it to infer speaking rate.")
 
 
 class InterviewSession(InterviewSettings):

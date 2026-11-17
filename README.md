@@ -4,25 +4,36 @@ Akshay's interview engine and Charan's feedback engine are developed independent
 then connected using the same session JSON. Work in this checkout is on
 `akshay-interview`; the feedback module and root integration apps are untouched.
 
-## Current milestone: Phase 2 — resume and JD preparation
+## Current milestone: Phase 4 — interactive HR interviews
 
 - React + Vite dashboard, Tailwind CSS, Axios and Lucide icons.
 - FastAPI backend, environment configuration, restricted local CORS and API docs.
 - Versioned Pydantic contract, generated JSON Schema, synthetic sample and validation API.
 - Working frontend → backend sample load and contract validation, plus JSON download.
-- Responsive overview and interview-preference preview.
+- Responsive overview and shared interview preferences.
 - Resume PDF upload with editable skills, projects, education and experience.
 - Job description PDF upload or pasted text, with editable required skills.
 - Reviewed skill comparison with alias matching and preparation JSON export.
 - Bounded local PDF extraction with clear errors and extraction warnings.
+- Gemini HR question generation from full reviewed resume context/profile and JD.
+- HR/behavioral/situational categories, reflection depth and 1–15 questions.
+- Gemini-only generation with direct interview start and one question at a time.
+- Automatic Gemini model failover with a bounded request budget and outage cooldowns.
+- Interview room with typed/voice-assisted answers, navigation, progress and pause/resume.
+- Browser draft recovery, JSON plan/draft import and backup download.
+- Gemini answer-dependent HR follow-ups and validated completed-interview JSON export.
 
-**Not implemented yet:** Gemini generation, live interviews, voice capture,
-draft recovery, MongoDB persistence or feedback. Phase 3 has not started.
-Sample-session data is synthetic. Setup controls remain a preview and are not saved.
-Resume/JD work stays in browser memory across navigation, but clears on refresh.
+**Not implemented yet:** MongoDB persistence, cross-device history or feedback.
+Phase 5 has not started. Sample-session data is synthetic.
+Resume/JD setup and unstarted question plans clear on refresh. Once an interview
+starts, optional browser recovery retains its context, questions, answers and timer.
 The backend does not save uploaded PDFs, extracted text or preparation records to
 application storage. Multipart handling may use temporary spooling while reading
-the request. Phase 2 makes no requests to Gemini or other AI services.
+the request. Extraction and comparison make no external AI calls. Generating with
+Gemini sends reviewed resume text/profile, the full JD and settings to Google.
+Question generation requires Gemini; errors are shown without substitute questions.
+See [Phase 3 setup and checks](modules/interview_engine/PHASE3.md).
+See [Phase 4 workflow, recovery and voice notes](modules/interview_engine/PHASE4.md).
 
 ## Run locally (PowerShell)
 
@@ -42,9 +53,10 @@ Copy-Item modules/interview_engine/backend/.env.example modules/interview_engine
 ```
 
 On subsequent starts, run only the last command. Do not overwrite an existing `.env`.
-No Gemini key or MongoDB account is required for Phases 1–2. The reserved server-only
-environment values are for later phases; the health check does not claim those
-services are connected. Never put secrets in `VITE_*` variables.
+No Gemini key or MongoDB account is required for Phases 1–2. Configure a backend
+Gemini key to use Phase 3 question generation. All questions come from live AI
+generation. Health/options report configuration, not API validity or available quota.
+Never put secrets in `VITE_*` variables. MongoDB saving is reserved for Phase 5.
 
 `requirements.lock.txt` records the exact environment verified on Windows with
 Python 3.14. The direct runtime and development dependency lists are also retained
@@ -85,10 +97,12 @@ single-user foundation should not be exposed publicly without deployment hardeni
 
 The **Sample session** navigation item retains Phase 1 contract validation/export.
 The preparation JSON is a distinct `preparation-1.0` document, not a completed
-`InterviewSession`. Later question generation will consume its reviewed profiles.
+`InterviewSession`. Question generation uses its reviewed profiles plus the editable
+**Reviewed resume context** and complete **Reviewed job description**.
 
 If the backend is offline, the dashboard explains the error. Start the backend and
-use its retry button. No button simulates AI generation or database saving.
+use its retry button. Gemini status also refreshes when you open the HR question studio.
+No database saving is implemented yet.
 
 ### Phase 2 endpoints and limitations
 
@@ -126,6 +140,7 @@ From the repository root:
 .\modules\interview_engine\backend\.venv\Scripts\python.exe -m modules.interview_engine.backend.export_schema
 .\modules\interview_engine\backend\.venv\Scripts\python.exe -m pytest modules/interview_engine/backend/tests -q
 npm --prefix modules/interview_engine/frontend run build
+npm --prefix modules/interview_engine/frontend test
 ```
 
 The frontend build writes ignored `dist/` output. `npm run preview` serves that build
@@ -154,14 +169,15 @@ contracts/
 
 The shared `contracts/` files and Python package markers support independent work.
 There are no changes to `modules/feedback_engine/`, `frontend/` or `backend/`.
-`InterviewApp` will accept `onComplete` when actual interview completion is added.
+`InterviewApp` accepts `onComplete(session)` and calls it after successful backend
+completion validation. It does not call Charan's API or calculate feedback itself.
 Later the shared backend can mount `routes.router` at `/api/interview`.
 
 ## Five-phase roadmap
 
 1. **Foundation:** standalone apps, dashboard, configuration and shared contract.
 2. **Resume and JD intelligence:** upload, extraction, editable profiles and skill comparison.
-3. **Personalized questions:** interview settings, Gemini generation, validation and labelled fallback.
+3. **Personalized questions:** interview settings, Gemini-only generation, validation and fresh sets.
 4. **Interview experience:** text/voice answers, timer, progress, draft recovery and follow-ups.
 5. **Storage and delivery:** MongoDB persistence, session retrieval, export and integration checks.
 

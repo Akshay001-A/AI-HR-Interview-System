@@ -39,6 +39,7 @@
             }
           ],
           "default": null,
+          "description": "Measured active time on this question, including reading and editing. Not speech-only duration; do not use it to infer speaking rate.",
           "title": "Duration Seconds"
         }
       },

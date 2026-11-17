@@ -9,6 +9,7 @@ export const api = axios.create({
 export function errorMessage(error) {
   const detail = error.response?.data?.detail
   if (typeof detail === 'string') return detail
+  if (detail && typeof detail.message === 'string') return detail.message
   if (Array.isArray(detail)) {
     return detail.map(item => `${item.loc?.filter(part => part !== 'body').join(' → ') || 'Input'}: ${item.msg}`).join('. ')
   }

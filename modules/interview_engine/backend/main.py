@@ -9,8 +9,8 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
         title="AI HR Interview — Interview Engine",
-        version="0.2.0",
-        description="Akshay's standalone module. Phase 2: resume/JD extraction and reviewed skill comparison.",
+        version="0.4.0",
+        description="Akshay's standalone module. Phase 4: interactive HR interviews, answer-dependent follow-ups and completed-session handoff.",
     )
     app.add_middleware(
         CORSMiddleware,
@@ -26,10 +26,10 @@ def create_app() -> FastAPI:
         return {
             "status": "ok",
             "service": "interview-engine",
-            "phase": 2,
+            "phase": 4,
             "schema_version": "1.0",
             "integrations": {
-                "gemini": "not_enabled",
+                "gemini": "configured" if settings.gemini_api_key.get_secret_value() else "not_configured",
                 "mongodb": "not_enabled",
             },
         }

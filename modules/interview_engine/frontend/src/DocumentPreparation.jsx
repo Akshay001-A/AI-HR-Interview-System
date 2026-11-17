@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import { ArrowDownToLine, ArrowRight, CheckCircle2, CircleHelp, FileText, LoaderCircle, RefreshCw, Scale, Upload, X } from 'lucide-react'
 import { api, errorMessage, postForm } from './api'
+import { preparationData, resumeFields } from './preparation'
 
-const lines = text => text.split('\n').map(line => line.trim()).filter(Boolean)
-const resumeFields = ['skills', 'projects', 'education', 'experience']
-
-function ProfileField({ name, value, onChange, hint, rows = 4, disabled }) {
+function ProfileField({ name, value, onChange, hint, rows = 4, disabled, maxLength }) {
   return (
     <label className="profile-field">
       <span>{name}</span>
       <small>{hint || 'One entry per line. Review or add missing details.'}</small>
-      <textarea value={value} onChange={event => onChange(event.target.value)} rows={rows} disabled={disabled} />
+      <textarea value={value} onChange={event => onChange(event.target.value)} rows={rows} disabled={disabled} maxLength={maxLength} />
     </label>
   )
 }
@@ -35,7 +33,7 @@ function PDFInput({ label, busy, disabled, onFile }) {
   </label>
 }
 
-export default function DocumentPreparation({ documents, setDocuments }) {
+export default function DocumentPreparation({ documents, setDocuments, onContinue }) {
   const [jdMode, setJDMode] = useState('text')
   const [jdText, setJDText] = useState('')
   const [resumeBusy, setResumeBusy] = useState(false)
@@ -78,7 +76,7 @@ export default function DocumentPreparation({ documents, setDocuments }) {
       const { data } = await postForm(`/interview/${kind}`, form)
       const profile = kind === 'resume' ? data.resume_profile : data.job_description
       const fields = kind === 'resume'
-        ? Object.fromEntries(resumeFields.map(field => [field, profile[field].join('\n')]))
+        ? { ...Object.fromEntries(resumeFields.map(field => [field, profile[field].join('\n')])), context: data.extracted_text }
         : { text: profile.text, required_skills: profile.required_skills.join('\n') }
       setDocuments(previous => ({ ...previous, [kind]: { ...data, fields }, analysis: null }))
       setAnnouncement(`${kind === 'resume' ? 'Resume' : 'Job description'} extracted. Review the suggested fields below.`)
@@ -90,13 +88,7 @@ export default function DocumentPreparation({ documents, setDocuments }) {
     setError('analysis', '')
     setCompareBusy(true)
     try {
-      const { data } = await api.post('/interview/analyze', {
-        resume_profile: Object.fromEntries(resumeFields.map(field => [field, lines(documents.resume.fields[field])])),
-        job_description: {
-          text: documents.jd.fields.text.trim(),
-          required_skills: lines(documents.jd.fields.required_skills),
-        },
-      })
+      const { data } = await api.post('/interview/analyze', preparationData(documents))
       setDocuments(previous => ({ ...previous, analysis: data }))
       setAnnouncement('Skill comparison updated from your reviewed profiles.')
     } catch (error) { setError('analysis', errorMessage(error)) }
@@ -118,7 +110,7 @@ export default function DocumentPreparation({ documents, setDocuments }) {
 
   const { resume, jd, analysis } = documents
   return <div className="preparation-workspace">
-    <div className="preparation-intro"><ShieldNotice /><p>Extract, review, then compare. Documents are processed by this backend without Gemini calls or database storage. Unsaved work clears on refresh.</p></div>
+    <div className="preparation-intro"><ShieldNotice /><p>Extraction and skill comparison run locally. Review the full context before choosing Gemini question generation. Unsaved work clears on refresh; documents are not stored in a database.</p></div>
     <p className="sr-only" aria-live="polite">{announcement}</p>
     <div className="preparation-grid">
       <section className="panel document-panel" aria-labelledby="resume-title">
@@ -131,6 +123,7 @@ export default function DocumentPreparation({ documents, setDocuments }) {
           <Notices metadata={resume.metadata} />
           <fieldset disabled={busy}>
             {resumeFields.map(field => <ProfileField key={field} name={`Resume ${field}`} value={resume.fields[field]} onChange={value => updateProfile('resume', field, value)} hint={field === 'skills' ? 'One skill per line. Add skills the parser missed.' : undefined} rows={field === 'skills' ? 5 : 3} />)}
+            <ProfileField name="Reviewed resume context" value={resume.fields.context ?? resume.extracted_text} onChange={value => updateProfile('resume', 'context', value)} hint="Review the complete text, including achievements and responsibilities missed above. This context is included when you generate questions with Gemini. Profile fields above take priority if they conflict." rows={8} maxLength={60000} />
           </fieldset>
           <details className="raw-extraction"><summary>View extracted resume text</summary><pre>{resume.extracted_text}</pre></details>
         </div>}
@@ -173,8 +166,9 @@ export default function DocumentPreparation({ documents, setDocuments }) {
           <article className="skill-group gaps"><h3>Not listed in your resume <span>{analysis.skill_gaps.length}</span></h3><div className="skill-chips">{analysis.skill_gaps.map(skill => <span key={skill}>{skill}</span>)}</div>{!analysis.skill_gaps.length && <p>{analysis.job_description.required_skills.length ? 'All reviewed JD skills are listed in your resume profile.' : 'The JD skill list is empty. Add requirements above for a useful comparison.'}</p>}</article>
         </div>
         <p className="comparison-note">{analysis.note}</p>
-        <div className="preparation-actions"><button className="button button-outline" onClick={downloadPreparation}><ArrowDownToLine size={16} /> Download preparation JSON</button><span>Question generation is the next phase.</span></div>
+        <div className="preparation-actions"><button className="button button-outline" onClick={downloadPreparation}><ArrowDownToLine size={16} /> Download preparation JSON</button></div>
       </div>}
+      {resume && jd && <div className="preparation-actions"><button className="button button-primary" disabled={busy} onClick={onContinue}>Create HR questions <ArrowRight size={16} /></button><span>Uses your reviewed resume and full JD, beyond matching skills.</span></div>}
     </section>
   </div>
 }

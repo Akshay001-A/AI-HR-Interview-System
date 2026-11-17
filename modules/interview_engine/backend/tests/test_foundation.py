@@ -31,7 +31,7 @@ def test_health_does_not_expose_secrets(monkeypatch):
             assert response.status_code == 200
             assert response.json()["status"] == "ok"
             assert "private-test" not in response.text
-            assert response.json()["integrations"]["gemini"] == "not_enabled"
+            assert response.json()["integrations"]["gemini"] == "configured"
     finally:
         get_settings.cache_clear()
 
