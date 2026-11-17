@@ -1,0 +1,279 @@
+{
+  "$defs": {
+    "Answer": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "answer": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "input_mode": {
+          "enum": [
+            "text",
+            "voice"
+          ],
+          "title": "Input Mode",
+          "type": "string"
+        },
+        "duration_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Active engagement time including reading/editing; never speech duration.",
+          "title": "Duration Seconds"
+        }
+      },
+      "required": [
+        "question_id",
+        "question",
+        "answer",
+        "input_mode"
+      ],
+      "title": "Answer",
+      "type": "object"
+    },
+    "JobDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 30000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "required_skills": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Required Skills",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "JobDescription",
+      "type": "object"
+    },
+    "Profile": {
+      "additionalProperties": false,
+      "properties": {
+        "skills": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 200,
+          "title": "Skills",
+          "type": "array"
+        },
+        "projects": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Projects",
+          "type": "array"
+        },
+        "education": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Education",
+          "type": "array"
+        },
+        "experience": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 100,
+          "title": "Experience",
+          "type": "array"
+        }
+      },
+      "title": "Profile",
+      "type": "object"
+    },
+    "Question": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "question": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "parent_question_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Question Id"
+        }
+      },
+      "required": [
+        "question_id",
+        "question"
+      ],
+      "title": "Question",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "session_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "role": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Role",
+      "type": "string"
+    },
+    "category": {
+      "default": "HR",
+      "enum": [
+        "HR",
+        "Behavioral",
+        "Situational"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "difficulty": {
+      "default": "Beginner",
+      "enum": [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "question_count": {
+      "maximum": 15,
+      "minimum": 1,
+      "title": "Question Count",
+      "type": "integer"
+    },
+    "resume_profile": {
+      "$ref": "#/$defs/Profile"
+    },
+    "job_description": {
+      "$ref": "#/$defs/JobDescription"
+    },
+    "resume_context": {
+      "anyOf": [
+        {
+          "maxLength": 60000,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume Context"
+    },
+    "matched_skills": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Matched Skills",
+      "type": "array"
+    },
+    "skill_gaps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 200,
+      "title": "Skill Gaps",
+      "type": "array"
+    },
+    "questions": {
+      "items": {
+        "$ref": "#/$defs/Question"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Questions",
+      "type": "array"
+    },
+    "answers": {
+      "items": {
+        "$ref": "#/$defs/Answer"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Answers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "session_id",
+    "role",
+    "question_count",
+    "resume_profile",
+    "job_description",
+    "questions",
+    "answers"
+  ],
+  "title": "CompletedInterview",
+  "type": "object"
+}

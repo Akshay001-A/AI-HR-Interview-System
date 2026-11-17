@@ -1,0 +1,408 @@
+{
+  "$defs": {
+    "AnswerStatistic": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "word_count": {
+          "minimum": 0,
+          "title": "Word Count",
+          "type": "integer"
+        },
+        "input_mode": {
+          "enum": [
+            "text",
+            "voice"
+          ],
+          "title": "Input Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "question_id",
+        "word_count",
+        "input_mode"
+      ],
+      "title": "AnswerStatistic",
+      "type": "object"
+    },
+    "Evaluation": {
+      "additionalProperties": false,
+      "properties": {
+        "question_id": {
+          "maxLength": 100,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Question Id",
+          "type": "string"
+        },
+        "criteria": {
+          "$ref": "#/$defs/Rubric"
+        },
+        "strengths": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Strengths",
+          "type": "array"
+        },
+        "weaknesses": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 5,
+          "minItems": 1,
+          "title": "Weaknesses",
+          "type": "array"
+        },
+        "answer_template": {
+          "maxLength": 5000,
+          "minLength": 1,
+          "title": "Answer Template",
+          "type": "string"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "parent_question_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Parent Question Id"
+        },
+        "answer": {
+          "minLength": 1,
+          "title": "Answer",
+          "type": "string"
+        },
+        "input_mode": {
+          "enum": [
+            "text",
+            "voice"
+          ],
+          "title": "Input Mode",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "question_id",
+        "criteria",
+        "strengths",
+        "weaknesses",
+        "answer_template",
+        "question",
+        "parent_question_id",
+        "answer",
+        "input_mode",
+        "score"
+      ],
+      "title": "Evaluation",
+      "type": "object"
+    },
+    "Generation": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "const": "gemini",
+          "title": "Source",
+          "type": "string"
+        },
+        "model": {
+          "minLength": 1,
+          "title": "Model",
+          "type": "string"
+        },
+        "models_attempted": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Models Attempted",
+          "type": "array"
+        },
+        "attempt_count": {
+          "maximum": 20,
+          "minimum": 1,
+          "title": "Attempt Count",
+          "type": "integer"
+        },
+        "elapsed_seconds": {
+          "minimum": 0,
+          "title": "Elapsed Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "source",
+        "model",
+        "models_attempted",
+        "attempt_count",
+        "elapsed_seconds"
+      ],
+      "title": "Generation",
+      "type": "object"
+    },
+    "Rubric": {
+      "additionalProperties": false,
+      "properties": {
+        "relevance": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Relevance",
+          "type": "integer"
+        },
+        "clarity": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Clarity",
+          "type": "integer"
+        },
+        "structure": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Structure",
+          "type": "integer"
+        },
+        "completeness": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Completeness",
+          "type": "integer"
+        },
+        "examples": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Examples",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "relevance",
+        "clarity",
+        "structure",
+        "completeness",
+        "examples"
+      ],
+      "title": "Rubric",
+      "type": "object"
+    },
+    "Storage": {
+      "additionalProperties": false,
+      "properties": {
+        "saved": {
+          "title": "Saved",
+          "type": "boolean"
+        },
+        "engine": {
+          "enum": [
+            "sqlite",
+            "mongodb"
+          ],
+          "title": "Engine",
+          "type": "string"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "saved",
+        "engine",
+        "message"
+      ],
+      "title": "Storage",
+      "type": "object"
+    },
+    "TextAnalysis": {
+      "additionalProperties": false,
+      "properties": {
+        "word_count": {
+          "minimum": 0,
+          "title": "Word Count",
+          "type": "integer"
+        },
+        "per_answer": {
+          "items": {
+            "$ref": "#/$defs/AnswerStatistic"
+          },
+          "title": "Per Answer",
+          "type": "array"
+        },
+        "filler_breakdown": {
+          "additionalProperties": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": "Filler Breakdown",
+          "type": "object"
+        },
+        "filler_words_detected": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Filler Words Detected",
+          "type": "array"
+        },
+        "filler_word_count": {
+          "minimum": 0,
+          "title": "Filler Word Count",
+          "type": "integer"
+        },
+        "notice": {
+          "minLength": 1,
+          "title": "Notice",
+          "type": "string"
+        },
+        "timing_notice": {
+          "minLength": 1,
+          "title": "Timing Notice",
+          "type": "string"
+        }
+      },
+      "required": [
+        "word_count",
+        "per_answer",
+        "filler_breakdown",
+        "filler_words_detected",
+        "filler_word_count",
+        "notice",
+        "timing_notice"
+      ],
+      "title": "TextAnalysis",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "report_version": {
+      "const": "2.0",
+      "title": "Report Version",
+      "type": "string"
+    },
+    "session_id": {
+      "maxLength": 100,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Session Id",
+      "type": "string"
+    },
+    "role": {
+      "minLength": 1,
+      "title": "Role",
+      "type": "string"
+    },
+    "category": {
+      "enum": [
+        "HR",
+        "Behavioral",
+        "Situational"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "difficulty": {
+      "enum": [
+        "Beginner",
+        "Intermediate",
+        "Advanced"
+      ],
+      "title": "Difficulty",
+      "type": "string"
+    },
+    "overall_score": {
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Overall Score",
+      "type": "integer"
+    },
+    "criteria_averages": {
+      "$ref": "#/$defs/Rubric"
+    },
+    "evaluations": {
+      "items": {
+        "$ref": "#/$defs/Evaluation"
+      },
+      "maxItems": 20,
+      "minItems": 1,
+      "title": "Evaluations",
+      "type": "array"
+    },
+    "communication_analysis": {
+      "$ref": "#/$defs/TextAnalysis"
+    },
+    "recommendations": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Recommendations",
+      "type": "array"
+    },
+    "generation": {
+      "$ref": "#/$defs/Generation"
+    },
+    "created_at": {
+      "minLength": 1,
+      "title": "Created At",
+      "type": "string"
+    },
+    "notice": {
+      "minLength": 1,
+      "title": "Notice",
+      "type": "string"
+    },
+    "storage": {
+      "$ref": "#/$defs/Storage"
+    }
+  },
+  "required": [
+    "report_version",
+    "session_id",
+    "role",
+    "category",
+    "difficulty",
+    "overall_score",
+    "criteria_averages",
+    "evaluations",
+    "communication_analysis",
+    "recommendations",
+    "generation",
+    "created_at",
+    "notice",
+    "storage"
+  ],
+  "title": "FeedbackReport",
+  "type": "object"
+}

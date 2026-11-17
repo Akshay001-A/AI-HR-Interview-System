@@ -1,49 +1,57 @@
-import sys
-from pathlib import Path
-from fastapi import FastAPI
+"""Common API entry point. The interview module is connected in the next integration step."""
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from backend.config import get_settings
+from modules.feedback_engine.backend.routes import router
 
-# Ensure modules can be imported
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
-app = FastAPI(title="AI HR Interview System")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174", "*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Try importing Akshay's interview engine if present
-try:
-    from modules.interview_engine.backend.routes import router as interview_router
-    app.include_router(interview_router, prefix="/api/interview")
-except ImportError:
-    pass
-
-# Import Charan's feedback engine
-from modules.feedback_engine.backend.routes import router as feedback_router
-app.include_router(feedback_router, prefix="/api/feedback")
+MAX_BODY = 2 * 1024 * 1024
 
 
-@app.get("/")
-def root():
-    return {
-        "project": "AI-Powered HR Interview Preparation and Personalized Feedback System for Students",
-        "team": [
-            "Akshay R (1MS23IS008) - AI Interview Engine",
-            "Charan Kumar R (1MS23IS031) - AI Feedback Engine"
-        ],
-        "feedback_engine_status": "Ready",
-        "endpoints": {
-            "evaluate": "POST /api/feedback/evaluate",
-            "report": "GET /api/feedback/report/{session_id}"
-        }
-    }
+class BodyLimit:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope['type'] != 'http' or scope.get('method') not in ('POST', 'PUT', 'PATCH'):
+            return await self.app(scope, receive, send)
+        body = bytearray()
+        while True:
+            event = await receive()
+            if event['type'] == 'http.disconnect':
+                return
+            body.extend(event.get('body', b''))
+            if len(body) > MAX_BODY:
+                return await JSONResponse({'detail': 'Choose an interview JSON file no larger than 2 MB.'}, status_code=413)(scope, receive, send)
+            if not event.get('more_body', False):
+                break
+        consumed = False
+        async def replay():
+            nonlocal consumed
+            if not consumed:
+                consumed = True
+                return {'type': 'http.request', 'body': bytes(body), 'more_body': False}
+            return await receive()
+        await self.app(scope, replay, send)
 
 
-if __name__ == "__main__":
+app = FastAPI(title='Interview Studio', version='0.5.0')
+app.add_middleware(BodyLimit)
+app.add_middleware(CORSMiddleware, allow_origins=get_settings().cors_origins,
+                    allow_credentials=False, allow_methods=['GET', 'POST'], allow_headers=['Content-Type'])
+app.include_router(router, prefix='/api/feedback')
+
+
+@app.get('/api/health')
+def health():
+    return {'status': 'ok'}
+
+
+@app.exception_handler(Exception)
+async def unexpected_error(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={'detail': 'The request could not be completed. Please try again. No substitute feedback was created.'})
+
+
+if __name__ == '__main__':
     import uvicorn
-    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run('backend.main:app', host='127.0.0.1', port=8000, reload=True)
