@@ -1,0 +1,30 @@
+{
+  "session_id": "session_001",
+  "role": "Software Developer",
+  "category": "HR",
+  "difficulty": "Beginner",
+  "resume_profile": {
+    "skills": ["Python", "SQL"],
+    "projects": ["Machine Learning Project"]
+  },
+  "job_description": {
+    "text": "Seeking Python, SQL and teamwork skills.",
+    "required_skills": ["Python", "SQL", "Teamwork"]
+  },
+  "answers": [
+    {
+      "question_id": "q1",
+      "question": "Why are you suitable for this role?",
+      "answer": "I have worked with Python and SQL.",
+      "input_mode": "voice",
+      "duration_seconds": 35
+    },
+    {
+      "question_id": "q2",
+      "question": "Tell me about a time you handled a difficult team challenge.",
+      "answer": "In our college project, we faced a tight deadline. I coordinated tasks with teammates and we delivered on time.",
+      "input_mode": "text",
+      "duration_seconds": 45
+    }
+  ]
+}
