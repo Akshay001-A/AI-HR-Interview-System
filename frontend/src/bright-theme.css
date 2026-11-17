@@ -1,0 +1,36 @@
+/* Keep the original green-and-cream design; strengthen text and outlines. */
+:root { --text-muted: #526657; }
+.page-heading p, .panel-description, .form-note, .range-labels,
+.journey-card p, .section-heading p, .sidebar-note p,
+.sidebar-footer, .sidebar-footer strong, .workspace-tag, .topbar,
+.document-empty, .profile-field > small, .comparison-note,
+.preparation-actions > span, .studio-review small, .studio-depth-note p,
+.studio-document p, .studio-document small, .room-checkbox small,
+.room-preflight > p, .room-answer-meta, .room-voice > p,
+.room-followup-actions > span, .room-complete > p, .room-review > p,
+.room-session-id, .page-footer { color: #526657; }
+.eyebrow { color: #607055; }
+.nav-item { color: #54695e; }
+.nav-item.active { color: #194f40; }
+.topbar strong, .studio-settings .form-grid label, .form-grid label,
+.profile-field > span, .studio-review strong, .room-checkbox strong,
+.room-answer-label { color: #3e5d46; }
+.panel, .journey-card, .studio-brief, .room-question-card,
+.room-question-nav, .room-preflight-notes, .overview-draft-banner,
+.heading-icon, .room-import { border-color: #b8cbb2; }
+.sidebar, .topbar, .studio-document, .page-footer { border-color: #ccd7c5; }
+.button-outline { border-color: #a9bfa3; color: #315c41; }
+.form-grid input:not([type="range"]), .form-grid select,
+.studio-settings .form-grid input:not([type="range"]), .studio-settings select,
+.profile-field textarea, .room-answer-label textarea { border-color: #aec3a4; color: #294b35; }
+textarea::placeholder, input::placeholder { color: #66785e; opacity: 1; }
+.hero-copy > p, .hero-caption { color: #d5e5da; }
+.pill { color: #e4edd8; border-color: #ffffff45; }
+.room-session-header p, .room-session-header .eyebrow { color: #d5e5cf; }
+.room-timer small { color: #d2e1d2; }
+.room-question-nav button small { color: #607452; }
+.overview-draft-banner p { color: #577047; }
+.overview-draft-banner strong { color: #365e2c; }
+.studio-depth-note, .room-preflight-notes { color: #557742; }
+.room-preflight-notes > span { color: #506e40; }
+.room-progress, .room-question-nav button.current { border-color: #b8cbb2; }

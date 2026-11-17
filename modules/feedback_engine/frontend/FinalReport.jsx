@@ -1,0 +1,4 @@
+import { CRITERIA } from '../../../frontend/src/feedback'
+export default function FinalReport({ reportData: report }) {
+  return <div><div className="feedback-score-grid"><section className="panel feedback-score"><span className="eyebrow">PRACTICE ANSWER SCORE</span><strong>{report.overall_score}<small>/100</small></strong><p>An average of your answer scores.</p></section><section className="panel feedback-rubric"><h3>Your HR practice rubric</h3>{CRITERIA.map(key => <div key={key}><label htmlFor={`score-${key}`}><span>{key}</span><strong>{report.criteria_averages[key]}/100</strong></label><progress id={`score-${key}`} value={report.criteria_averages[key]} max="100" /></div>)}</section></div><p className="feedback-note">{report.notice}</p><p className="feedback-note">{report.storage.saved ? 'Saved in your report history.' : 'Not saved. Download this report before leaving.'}</p></div>
+}

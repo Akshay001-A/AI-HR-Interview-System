@@ -1,1 +1,1 @@
-"""Independent application modules."""
+# Modules package root
